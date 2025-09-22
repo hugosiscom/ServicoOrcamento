@@ -1,0 +1,6 @@
+instalar serviço
+"C:\service\Serverservice.exe" -install
+
+
+remover serviço
+"C:\service\Serverservice.exe" -uninstall
