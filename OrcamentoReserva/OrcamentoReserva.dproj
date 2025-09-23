@@ -133,6 +133,7 @@
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="C:\Trabalho Atual\Compartilhado\encrypt_decrypt.pas"/>
+        <DCCReference Include="C:\Trabalho Atual\Compartilhado\UUtilidade.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -248,4 +248,76 @@ object DataModule1: TDataModule1
       Precision = 18
     end
   end
+  object QryLogs: TFDQuery
+    Connection = FDConn
+    SQL.Strings = (
+      'select LOG.*, USU.DS_USUARIO,PAR.LOJA '
+      'From LOGS_USER LOG '
+      'Inner Join USUARIOS_FIN USU On (USU.CD_USUARIO= LOG.COD_USUARIO)'
+      'Inner Join PARAMETROS PAR On (PAR.LOJA = LOG.COD_EMPRESA) '
+      'where LOG.CODIGO=:CODIGO_AUD')
+    Left = 48
+    Top = 384
+    ParamData = <
+      item
+        Name = 'CODIGO_AUD'
+        DataType = ftInteger
+        ParamType = ptInput
+        Value = Null
+      end>
+    object QryLogsCODIGO: TIntegerField
+      AutoGenerateValue = arAutoInc
+      FieldName = 'CODIGO'
+      Origin = 'CODIGO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+    end
+    object QryLogsCOD_EMPRESA: TIntegerField
+      FieldName = 'COD_EMPRESA'
+      Origin = 'COD_EMPRESA'
+    end
+    object QryLogsTABELA: TStringField
+      FieldName = 'TABELA'
+      Origin = 'TABELA'
+      Size = 30
+    end
+    object QryLogsDATA: TDateField
+      FieldName = 'DATA'
+      Origin = '"DATA"'
+    end
+    object QryLogsCOD_USUARIO: TIntegerField
+      FieldName = 'COD_USUARIO'
+      Origin = 'COD_USUARIO'
+    end
+    object QryLogsCAMPO_CHAVE: TIntegerField
+      FieldName = 'CAMPO_CHAVE'
+      Origin = 'CAMPO_CHAVE'
+    end
+    object QryLogsDESCRICAO: TMemoField
+      FieldName = 'DESCRICAO'
+      Origin = 'DESCRICAO'
+      BlobType = ftMemo
+    end
+    object QryLogsUSUARIO: TStringField
+      FieldName = 'USUARIO'
+      Origin = 'USUARIO'
+      Size = 40
+    end
+    object QryLogsDS_USUARIO: TStringField
+      AutoGenerateValue = arDefault
+      FieldName = 'DS_USUARIO'
+      Origin = 'DS_USUARIO'
+      ProviderFlags = []
+      ReadOnly = True
+      Size = 40
+    end
+    object QryLogsLOJA: TStringField
+      AutoGenerateValue = arDefault
+      FieldName = 'LOJA'
+      Origin = 'LOJA'
+      ProviderFlags = []
+      ReadOnly = True
+      FixedChar = True
+      Size = 2
+    end
+  end
 end

@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{5B9E06C9-682E-43A7-8100-46FD9CC4F7F6}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="ServicoOrcamentoReserva.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="OrcamentoReserva\OrcamentoReserva.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="ServicoOrcamentoReserva">
+        <MSBuild Projects="ServicoOrcamentoReserva.dproj"/>
+    </Target>
+    <Target Name="ServicoOrcamentoReserva:Clean">
+        <MSBuild Projects="ServicoOrcamentoReserva.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ServicoOrcamentoReserva:Make">
+        <MSBuild Projects="ServicoOrcamentoReserva.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OrcamentoReserva">
+        <MSBuild Projects="OrcamentoReserva\OrcamentoReserva.dproj"/>
+    </Target>
+    <Target Name="OrcamentoReserva:Clean">
+        <MSBuild Projects="OrcamentoReserva\OrcamentoReserva.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OrcamentoReserva:Make">
+        <MSBuild Projects="OrcamentoReserva\OrcamentoReserva.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="ServicoOrcamentoReserva;OrcamentoReserva"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="ServicoOrcamentoReserva:Clean;OrcamentoReserva:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="ServicoOrcamentoReserva:Make;OrcamentoReserva:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

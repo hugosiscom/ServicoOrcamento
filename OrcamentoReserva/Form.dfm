@@ -2,8 +2,8 @@ object Form4: TForm4
   Left = 0
   Top = 0
   Caption = 'Servi'#231'o Or'#231'amento'
-  ClientHeight = 306
-  ClientWidth = 546
+  ClientHeight = 99
+  ClientWidth = 230
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -12,8 +12,8 @@ object Form4: TForm4
   Font.Style = []
   TextHeight = 15
   object btnParar: TBitBtn
-    Left = 463
-    Top = 273
+    Left = 147
+    Top = 66
     Width = 75
     Height = 25
     Align = alCustom
@@ -21,12 +21,12 @@ object Form4: TForm4
     Caption = 'Parar'
     TabOrder = 0
     OnClick = btnPararClick
-    ExplicitLeft = 189
-    ExplicitTop = 14
+    ExplicitLeft = 463
+    ExplicitTop = 273
   end
   object btnIniciar: TBitBtn
     Left = 8
-    Top = 273
+    Top = 66
     Width = 75
     Height = 25
     Hint = 
@@ -37,12 +37,12 @@ object Form4: TForm4
     Caption = 'Iniciar'
     TabOrder = 1
     OnClick = btnIniciarClick
-    ExplicitTop = 14
+    ExplicitTop = 273
   end
   object Timer1: TTimer
     Interval = 3000
     OnTimer = Timer1Timer
-    Left = 248
-    Top = 104
+    Left = 96
+    Top = 8
   end
 end

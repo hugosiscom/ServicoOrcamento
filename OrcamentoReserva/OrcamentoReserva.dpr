@@ -4,7 +4,8 @@ uses
   Vcl.Forms,
   Form in 'Form.pas' {Form4},
   dm in 'dm.pas' {DataModule1: TDataModule},
-  encrypt_decrypt in 'C:\Trabalho Atual\Compartilhado\encrypt_decrypt.pas';
+  encrypt_decrypt in 'C:\Trabalho Atual\Compartilhado\encrypt_decrypt.pas',
+  UUtilidade in 'C:\Trabalho Atual\Compartilhado\UUtilidade.pas';
 
 {$R *.res}
 

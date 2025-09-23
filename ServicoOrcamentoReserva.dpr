@@ -4,7 +4,9 @@ uses
   Vcl.SvcMgr,
   UServicoPrincipal in 'UServicoPrincipal.pas' {ServiceOrcamentoReserva: TService},
   encrypt_decrypt in 'C:\Trabalho Atual\Compartilhado\encrypt_decrypt.pas',
-  dm in 'OrcamentoReserva\dm.pas' {DataModule1: TDataModule};
+  dm in 'OrcamentoReserva\dm.pas' {DataModule1: TDataModule},
+  UUtilidade in 'C:\Trabalho Atual\Compartilhado\UUtilidade.pas',
+  Form in 'OrcamentoReserva\Form.pas' {Form4};
 
 {$R *.RES}
 
@@ -27,5 +29,6 @@ begin
     Application.Initialize;
   Application.CreateForm(TServiceOrcamentoReserva, ServiceOrcamentoReserva);
   Application.CreateForm(TDataModule1, DataModule1);
+  Application.CreateForm(TForm4, Form4);
   Application.Run;
 end.
