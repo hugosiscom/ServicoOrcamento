@@ -16,6 +16,7 @@ object DataModule1: TDataModule1
     ResourceOptions.AutoReconnect = True
     TxOptions.Isolation = xiReadCommitted
     ConnectedStoredUsage = []
+    Connected = True
     LoginPrompt = False
     Left = 13
     Top = 8
@@ -39,18 +40,16 @@ object DataModule1: TDataModule1
       Origin = 'MINUTOS_LIMITE_ORCAMENTO'
     end
   end
-  object fdqEmpresaCount: TFDQuery
+  object fdqEmpresa: TFDQuery
     Connection = FDConn
     SQL.Strings = (
-      'select count(*) from empresa em where em.INATIVA = '#39'N'#39)
+      'select em.codigo from empresa em where em.INATIVA = '#39'N'#39)
     Left = 104
     Top = 8
-    object fdqEmpresaCountCOUNT: TLargeintField
-      AutoGenerateValue = arDefault
-      FieldName = 'COUNT'
-      Origin = '"COUNT"'
-      ProviderFlags = []
-      ReadOnly = True
+    object fdqEmpresaCODIGO: TIntegerField
+      FieldName = 'CODIGO'
+      Origin = 'CODIGO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
     end
   end
   object Timer1: TTimer

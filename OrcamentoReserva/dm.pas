@@ -12,8 +12,7 @@ type
   TDataModule1 = class(TDataModule)
     FDConn: TFDConnection;
     fdqParametros: TFDQuery;
-    fdqEmpresaCount: TFDQuery;
-    fdqEmpresaCountCOUNT: TLargeintField;
+    fdqEmpresa: TFDQuery;
     Timer1: TTimer;
     fdqParametrosMINUTOS_LIMITE_ORCAMENTO: TIntegerField;
     fdqOrcAbertos: TFDQuery;
@@ -54,9 +53,10 @@ type
     QryLogsUSUARIO: TStringField;
     QryLogsDS_USUARIO: TStringField;
     QryLogsLOJA: TStringField;
+    fdqEmpresaCODIGO: TIntegerField;
     procedure DataModuleCreate(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
-    procedure logBanco(E: Integer; codCampoChave: Integer; fdquery: TFDQuery; tabela: String);
+    procedure logBanco(codEmpresa: Integer; codCampoChave: Integer; fdquery: TFDQuery; tabela: String);
   private
     { Private declarations }
   public
@@ -99,7 +99,7 @@ begin
 
 end;
 
-procedure TDataModule1.logBanco(E: Integer; codCampoChave: Integer; fdquery: TFDQuery; tabela: String);
+procedure TDataModule1.logBanco(codEmpresa: Integer; codCampoChave: Integer; fdquery: TFDQuery; tabela: String);
 begin
   try
     var
@@ -107,13 +107,13 @@ begin
     stLog.AddStrings(GerarLogFD(fdquery, fdquery.UpdateStatus));
     QryLogs.Open;
     QryLogs.Append;
-    QryLogs.FieldByName('COD_EMPRESA').AsInteger := E;
+    QryLogs.FieldByName('COD_EMPRESA').AsInteger := codEmpresa;
     QryLogs.FieldByName('TABELA').AsString := tabela;
     QryLogs.FieldByName('DATA').AsDateTime := Date;
     QryLogs.FieldByName('COD_USUARIO').AsInteger := 1;
     QryLogs.FieldByName('CAMPO_CHAVE').AsInteger := codCampoChave;
     QryLogs.FieldByName('USUARIO').AsString := 'root';
-    QryLogs.FieldByName('DESCRICAO').AsString := stLog.Text + ' Feito AUTOMATICAMENTE pelo Serviço Orcamento Reserva';
+    QryLogs.FieldByName('DESCRICAO').AsString := stLog.Text + ' Gerado AUTOMATICAMENTE pelo Serviço Orcamento Reserva';
     QryLogs.Post;
     QryLogs.close;
     stLog.Clear;
@@ -133,12 +133,13 @@ begin
 
     Timer1.Enabled := false;
     try
-      fdqEmpresaCount.Open;
-
-      for var E: Integer := 1 to fdqEmpresaCountCOUNT.AsInteger do
+      fdqEmpresa.Open;
+      FDConn.StartTransaction;
+      fdqEmpresa.first;
+      while not fdqEmpresa.Eof do
       begin
         fdqParametros.close;
-        fdqParametros.ParamByName('CODEMPRESA').AsInteger := E;
+        fdqParametros.ParamByName('CODEMPRESA').AsInteger := fdqEmpresaCODIGO.AsInteger;
         fdqParametros.Open;
 
         var
@@ -147,63 +148,62 @@ begin
         if limiteMinutos > 0 then
         begin
           fdqOrcAbertos.close;
-          fdqOrcAbertos.ParamByName('CODEMPRESA').AsInteger := E;
+          fdqOrcAbertos.ParamByName('CODEMPRESA').AsInteger := fdqEmpresaCODIGO.AsInteger;
           fdqOrcAbertos.Open;
 
-          fdqOrcAbertos.First;
-
+          // somente orçamento reserva e no processados
+          fdqOrcAbertos.first;
           while not fdqOrcAbertos.Eof do
-            if (fdqOrcAbertosRESERVA.AsString = 'S') and (fdqOrcAbertosNOTA_PROCESSADA.AsString = 'N') then
+          begin
+            var
+            minutosPassados := MinutesBetween(Now, fdqOrcAbertosDATAHORA_COMPLETA.AsDateTime);
+
+            if minutosPassados > limiteMinutos then
             begin
-              var
-              minutosPassados := MinutesBetween(Now, fdqOrcAbertosDATAHORA_COMPLETA.AsDateTime);
+              fdqItemOrc.close;
+              fdqItemOrc.ParamByName('CD_ORCAM').AsInteger := fdqOrcAbertosCD_ORCAM.AsInteger;
+              fdqItemOrc.Open;
 
-              if minutosPassados > limiteMinutos then
+              fdqItemOrc.first;
+
+              while not fdqItemOrc.Eof do
               begin
-                fdqItemOrc.close;
-                fdqItemOrc.ParamByName('CD_ORCAM').AsInteger := fdqOrcAbertosCD_ORCAM.AsInteger;
-                fdqItemOrc.Open;
+                fdqEstoque.close;
+                fdqEstoque.ParamByName('CODPRODUTO').AsInteger := fdqItemOrcCD_PRODUTO.AsInteger;
+                fdqEstoque.ParamByName('CODEMPRESA').AsInteger := fdqEmpresaCODIGO.AsInteger;
+                fdqEstoque.Open;
 
-                fdqItemOrc.First;
-
-                while not fdqItemOrc.Eof do
+                if not fdqEstoque.IsEmpty then
                 begin
-                  fdqEstoque.close;
-                  fdqEstoque.ParamByName('CODPRODUTO').AsInteger := fdqItemOrcCD_PRODUTO.AsInteger;
-                  fdqEstoque.ParamByName('CODEMPRESA').AsInteger := E;
-                  fdqEstoque.Open;
+                  fdqEstoque.Edit;
+                  fdqEstoqueESTOQUE.AsCurrency := fdqEstoqueESTOQUE.AsCurrency + fdqItemOrcQTD_PRODUTO.AsCurrency;
+                  fdqEstoqueESTOQUE_RESERVA.AsCurrency := fdqEstoqueESTOQUE_RESERVA.AsCurrency - fdqItemOrcQTD_PRODUTO.AsCurrency;
+                  fdqEstoque.Post;
+                  fdqEstoque.ApplyUpdates;
 
-                  if not fdqEstoque.IsEmpty then
-                  begin
-                    fdqEstoque.Edit;
-                    fdqEstoqueESTOQUE.AsCurrency := fdqEstoqueESTOQUE.AsCurrency + fdqItemOrcQTD_PRODUTO.AsCurrency;
-                    fdqEstoqueESTOQUE_RESERVA.AsCurrency := fdqEstoqueESTOQUE_RESERVA.AsCurrency - fdqItemOrcQTD_PRODUTO.AsCurrency;
-                    fdqEstoque.Post;
-                    fdqEstoque.ApplyUpdates;
-
-                    logBanco(E, fdqItemOrcCD_PRODUTO.AsInteger, fdqEstoque, 'ESTOQUE');
-                  end;
-
-                  fdqItemOrc.Next;
+                  logBanco(fdqEmpresaCODIGO.AsInteger, fdqItemOrcCD_PRODUTO.AsInteger, fdqEstoque, 'ESTOQUE');
                 end;
-                fdqOrcAbertos.Edit;
-                fdqOrcAbertosCANCELADO_TP.AsString := 'EP';
-                fdqOrcAbertos.Post;
-                fdqOrcAbertos.ApplyUpdates;
 
-                logBanco(E, fdqOrcAbertosCD_ORCAM.AsInteger, fdqOrcAbertos, 'NOTAORC');
+                fdqItemOrc.Next;
+              end;
+              fdqOrcAbertos.Edit;
+              fdqOrcAbertosCANCELADO_TP.AsString := 'EP';
+              fdqOrcAbertos.Post;
+              fdqOrcAbertos.ApplyUpdates;
 
-                fdqOrcAbertos.Next;
-              end
-              else
-                fdqOrcAbertos.Next;
+              logBanco(fdqEmpresaCODIGO.AsInteger, fdqOrcAbertosCD_ORCAM.AsInteger, fdqOrcAbertos, 'NOTAORC');
+
+              fdqOrcAbertos.Next;
             end
             else
               fdqOrcAbertos.Next;
+          end
         end;
+        fdqEmpresa.Next;
       end;
     finally
-      fdqEmpresaCount.close;
+      FDConn.Commit;
+      fdqEmpresa.close;
       fdqParametros.close;
       fdqOrcAbertos.close;
       fdqItemOrc.close;
