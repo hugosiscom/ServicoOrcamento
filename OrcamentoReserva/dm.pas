@@ -87,12 +87,10 @@ begin
       FDConn.Params.Add('Database=' + (Ini.ReadString('Siscomsoft', ('PATH'), '')));
       FDConn.Params.Add('User_Name=' + (Ini.ReadString('Siscomsoft', ('USER'), '')));
       FDConn.Params.Add('Password=' + Decode(Ini.ReadString('Siscomsoft', ('Password'), '')));
-
       FDConn.Params.Add('Protocol=TCP');
       FDConn.Params.Add('Server=' + (Ini.ReadString('Siscomsoft', ('SERVER'), '')));
       FDConn.Params.Add('CharacterSet=' + (Ini.ReadString('Siscomsoft', ('ServerCharSet'), '')));
       FDConn.Params.Add('SQLDialect=' + (Ini.ReadString('Siscomsoft', ('SQLDialect'), '')));
-      // sConnStr := FDConn.ResultConnectionDef.BuildString();
 
       FDConn.Connected := True;
     finally
@@ -115,7 +113,7 @@ begin
     QryLogs.FieldByName('COD_USUARIO').AsInteger := 1;
     QryLogs.FieldByName('CAMPO_CHAVE').AsInteger := codCampoChave;
     QryLogs.FieldByName('USUARIO').AsString := 'root';
-    QryLogs.FieldByName('DESCRICAO').AsString := 'Feito AUTOMÁTICAMENTE pelo Serviço Orcamento Reserva: ' + stLog.Text;
+    QryLogs.FieldByName('DESCRICAO').AsString := stLog.Text + ' Feito AUTOMATICAMENTE pelo Serviço Orcamento Reserva';
     QryLogs.Post;
     QryLogs.close;
     stLog.Clear;
@@ -181,8 +179,8 @@ begin
                     fdqEstoqueESTOQUE.AsCurrency := fdqEstoqueESTOQUE.AsCurrency + fdqItemOrcQTD_PRODUTO.AsCurrency;
                     fdqEstoqueESTOQUE_RESERVA.AsCurrency := fdqEstoqueESTOQUE_RESERVA.AsCurrency - fdqItemOrcQTD_PRODUTO.AsCurrency;
                     fdqEstoque.Post;
+                    fdqEstoque.ApplyUpdates;
 
-                    logBanco(E, fdqItemOrcCD_PRODUTO.AsInteger, fdqEstoque, 'ESTOQUE');
                     logBanco(E, fdqItemOrcCD_PRODUTO.AsInteger, fdqEstoque, 'ESTOQUE');
                   end;
 
@@ -191,6 +189,7 @@ begin
                 fdqOrcAbertos.Edit;
                 fdqOrcAbertosCANCELADO_TP.AsString := 'EP';
                 fdqOrcAbertos.Post;
+                fdqOrcAbertos.ApplyUpdates;
 
                 logBanco(E, fdqOrcAbertosCD_ORCAM.AsInteger, fdqOrcAbertos, 'NOTAORC');
 

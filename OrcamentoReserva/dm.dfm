@@ -60,6 +60,7 @@ object DataModule1: TDataModule1
     Top = 16
   end
   object fdqOrcAbertos: TFDQuery
+    CachedUpdates = True
     Connection = FDConn
     SQL.Strings = (
       
@@ -152,6 +153,7 @@ object DataModule1: TDataModule1
     end
   end
   object fdqEstoque: TFDQuery
+    CachedUpdates = True
     Connection = FDConn
     SQL.Strings = (
       
