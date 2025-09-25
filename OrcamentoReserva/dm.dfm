@@ -16,7 +16,6 @@ object DataModule1: TDataModule1
     ResourceOptions.AutoReconnect = True
     TxOptions.Isolation = xiReadCommitted
     ConnectedStoredUsage = []
-    Connected = True
     LoginPrompt = False
     Left = 13
     Top = 8
@@ -43,7 +42,9 @@ object DataModule1: TDataModule1
   object fdqEmpresa: TFDQuery
     Connection = FDConn
     SQL.Strings = (
-      'select em.codigo from empresa em where em.INATIVA = '#39'N'#39)
+      
+        'select em.codigo from empresa em where em.INATIVA = '#39'N'#39' or em.IN' +
+        'ATIVA is null')
     Left = 104
     Top = 8
     object fdqEmpresaCODIGO: TIntegerField

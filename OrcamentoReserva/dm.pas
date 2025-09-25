@@ -4,7 +4,8 @@ interface
 
 uses
   System.SysUtils, System.Classes, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
-  FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client, FireDAC.Phys.FB,
+  FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client,
+  FireDAC.Phys.FB,
   FireDAC.Phys.FBDef, IniFiles, FireDAC.Stan.Param, FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet,
   Vcl.ExtCtrls, Vcl.Dialogs, System.DateUtils, encrypt_decrypt, UUtilidade;
 
@@ -81,22 +82,26 @@ begin
   Ini := TIniFile.create((ExtractFilePath(ParamStr(0)) + conect));
   with Ini do
     try
-      FDConn.Connected := false;
-      FDConn.Params.Clear;
-      FDConn.Params.Add('DriverID=FB');
-      FDConn.Params.Add('Database=' + (Ini.ReadString('Siscomsoft', ('PATH'), '')));
-      FDConn.Params.Add('User_Name=' + (Ini.ReadString('Siscomsoft', ('USER'), '')));
-      FDConn.Params.Add('Password=' + Decode(Ini.ReadString('Siscomsoft', ('Password'), '')));
-      FDConn.Params.Add('Protocol=TCP');
-      FDConn.Params.Add('Server=' + (Ini.ReadString('Siscomsoft', ('SERVER'), '')));
-      FDConn.Params.Add('CharacterSet=' + (Ini.ReadString('Siscomsoft', ('ServerCharSet'), '')));
-      FDConn.Params.Add('SQLDialect=' + (Ini.ReadString('Siscomsoft', ('SQLDialect'), '')));
+      try
+        FDConn.Connected := false;
+        FDConn.Params.Clear;
+        FDConn.Params.Add('DriverID=FB');
+        FDConn.Params.Add('Database=' + (Ini.ReadString('Siscomsoft', ('PATH'), '')));
+        FDConn.Params.Add('User_Name=' + (Ini.ReadString('Siscomsoft', ('USER'), '')));
+        FDConn.Params.Add('Password=' + Decode(Ini.ReadString('Siscomsoft', ('Password'), '')));
+        FDConn.Params.Add('Protocol=TCP');
+        FDConn.Params.Add('Server=' + (Ini.ReadString('Siscomsoft', ('SERVER'), '')));
+        FDConn.Params.Add('CharacterSet=' + (Ini.ReadString('Siscomsoft', ('ServerCharSet'), '')));
+        FDConn.Params.Add('SQLDialect=' + (Ini.ReadString('Siscomsoft', ('SQLDialect'), '')));
 
-      FDConn.Connected := True;
+        FDConn.Connected := True;
+      except
+        on E: Exception do
+          // ShowMessage(E.Message);
+      end;
     finally
       Ini.free;
     end;
-
 end;
 
 procedure TDataModule1.logBanco(codEmpresa: Integer; codCampoChave: Integer; fdquery: TFDQuery; tabela: String);
@@ -113,7 +118,7 @@ begin
     QryLogs.FieldByName('COD_USUARIO').AsInteger := 1;
     QryLogs.FieldByName('CAMPO_CHAVE').AsInteger := codCampoChave;
     QryLogs.FieldByName('USUARIO').AsString := 'root';
-    QryLogs.FieldByName('DESCRICAO').AsString := stLog.Text + ' Gerado AUTOMATICAMENTE pelo Serviço Orcamento Reserva';
+    QryLogs.FieldByName('DESCRICAO').AsString := stLog.Text + ' Gerado AUTOMATICAMENTE pelo Serviço Orçamento Reserva';
     QryLogs.Post;
     QryLogs.close;
     stLog.Clear;
@@ -151,7 +156,7 @@ begin
           fdqOrcAbertos.ParamByName('CODEMPRESA').AsInteger := fdqEmpresaCODIGO.AsInteger;
           fdqOrcAbertos.Open;
 
-          // somente orçamento reserva e no processados
+          // somente orçamento reserva e não processados
           fdqOrcAbertos.first;
           while not fdqOrcAbertos.Eof do
           begin
